@@ -14,8 +14,13 @@
 *** You should have received a copy of the GNU General Public License
 *** along with PHPUniversalAPI.  If not, see <http://www.gnu.org/licenses/>.*/
 
-include_once(dirname(__FILE__)."/utils.php");
-include_once(dirname(__FILE__)."/PUAPILogin.php");
-include_once(dirname(__FILE__)."/PUAPIBase.php");
+include_once(dirname(dirname(__FILE__))."/utils.php");
+include_once(dirname(dirname(__FILE__))."/PUAPILogin.php");
+include_once(dirname(dirname(__FILE__))."/PUAPIBase.php");
 include_once(dirname(__FILE__)."/PUAPIContact.php");
+$objContact=new PUAPIContact();
+$objContact->setColumnData("lastname",$data["lastname"]);
+$objContact->setColumnData("firstname",$data["firstname"]);
+$objContact->setColumnData("email",$data["email"]);
+$objContact->create();
 ?>
