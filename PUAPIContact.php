@@ -13,4 +13,19 @@
 
 *** You should have received a copy of the GNU General Public License
 *** along with PHPUniversalAPI.  If not, see <http://www.gnu.org/licenses/>.*/
+
+class PUAPIContact extends PUAPIBase
+{
+    protected $lastname="";
+    protected $assigned_user_id="";
+    protected $arrData=array();
+    public function __construct()
+    {
+        parent::__construct("Contacts");
+    }
+    public function setColumnData($columnField,$data)
+    {
+        $this->arrData[$columnField]=$data;
+    }
+}
 ?>
