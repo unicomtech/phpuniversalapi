@@ -16,60 +16,81 @@
 
 class PUAPILogin
 {
-    private $serverAddress="";
-    private $accessKey="";
     private $serverInfo=array();
-    public function __construct($serverAddress,$accessKey)
+    private $arrPostData=array();
+    private $arrGetData=array();
+    private $arrConfig=array();
+    
+    public function __construct()
     {
-        $this->serverAddress=$serverAddress;
-        $this->accessKey=$accessKey;
+        ob_start();
+        include("config.php");
+        ob_end_clean();
+        $this->arrConfig = get_defined_vars();
     }
-    public static function &getInstance($serverAddress,$accessKey,$username,$password)
+    public static function &getInstance()
     {
         static $instance=null;
         if(is_null($instance))
         {
-            $instance=new PUAPILogin($serverAddress,$accessKey);
-            $instance->login($username,$password);
+            $instance=new PUAPILogin();
         }
         return $instance;
     }
-    private function login($username,$password)
+    public function __set($name, $value) 
     {
-        static $response=null;
-        if(!is_null($response)) return $response;
-        ####################### SERVER #####################
-        $ServerAddress = $this->serverAddress;
-        $CRM_UserName = $username;
-        $CRM_UserPassword = $password;
-        $CRM_UserAccessKey = $this->accessKey;;
+        if(in_array($name,$this->arrConfig["PUAPI_LOGIN_POST_KEY"]))
+        {
+            $this->arrPostData[$name]=$value;
+        }
+        else if(in_array($name,$this->arrConfig["PUAPI_LOGIN_GET_KEY"]))
+        {
+            $this->arrGetData[$name]=$value;
+        }
+        else
+        {
+            die("class variable {$name} not exist");
+        }
+    }
+    public function login()
+    {
+        if(empty($this->arrPostData) && empty($this->arrGetData))
+        {
+            die("No post data or get data set for login");
+        }
+
+        $loginURL = "{$this->arrConfig["PUAPI_SERVER_URL"]}{$this->arrConfig["PUAPI_LOGIN_PAGE"]}";
+
+        $strGetData=false;
+        if($this->arrGetData)
+        foreach($this->arrGetData as $key=>$data)
+        {
+            if($strGetData===false)
+            {
+                $strGetData="{$key}={$data}";
+            }
+            else
+            {
+                $strGetData="{$strGetData}&{$key}={$data}";
+            }
+        }
         
-        #######[1]############### TAKE TOKEN ###################################
-        $TOKEN_URL = $ServerAddress."/webservice.php?operation=getchallenge&&username=".$CRM_UserName;
-        $TOKEN_DATA = json_decode(file_get_contents($TOKEN_URL));
+        if($strGetData===false) $URL=$loginURL;
+        else $URL = "{$loginURL}?{$strGetData}";
 
-        $CRM_TOKEN = $TOKEN_DATA->result->token;
-
-        #######[2]############### LOGIN TO CRM ###################################
-        $service_url = $ServerAddress."/webservice.php";
-        $curl_post_data = array(
-    'operation' => 'login',
-    'username' => $CRM_UserName,
-    'accessKey' => md5($CRM_TOKEN.$CRM_UserAccessKey),
-    );
-        $this->serverInfo=auieoCURLGet($service_url,$curl_post_data);
+        if(empty($this->arrPostData))
+        {
+            $this->serverInfo=file_get_contents($URL); 
+        }
+        else
+        {
+            $this->serverInfo=PUAPIGetCURL($URL,$this->arrPostData);
+        }
+        return $this->serverInfo;
     }
-    public function getSession()
+    public function getResult($key)
     {
-        return $this->serverInfo->result->sessionName;
-    }
-    public function getServerURL()
-    {
-        return $this->serverAddress;
-    }
-    public function getLoginUserID()
-    {
-        return $this->serverInfo->result->userId;
+        return isset($this->serverInfo->result->$key)?$this->serverInfo->result->$key:null;
     }
 }
 ?>

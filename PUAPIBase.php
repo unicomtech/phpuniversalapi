@@ -14,40 +14,72 @@
 *** You should have received a copy of the GNU General Public License
 *** along with PHPUniversalAPI.  If not, see <http://www.gnu.org/licenses/>.*/
 
+include_once(dirname(__FILE__)."/PUAPILogin.php");
+
 class PUAPIBase
 {
     protected $module="";
     protected $objLogin=null;
     protected $session="";
     protected $serverURL="";
-    public function __construct($module)
+    protected $arrConfig=array();
+    protected $arrGetData=array();
+    protected $serverInfo=null;
+    protected $arrStatus=array();
+    
+    public function __construct()
     {
-        $this->module=$module;
-        $this->serverURL="http://127.0.0.1:8080/projects/store/dnacrm";
-        $this->objLogin=ClsAuieoWSLogin::getInstance($this->serverURL,'a8POcwcdfybGUX9G',"admin","admin");
+        ob_start();
+        include("config.php");
+        ob_end_clean();
+        $this->arrConfig = get_defined_vars();
+        $this->serverURL=$this->arrConfig["PUAPI_SERVER_URL"];
     }
-    public function create()
+    public function __set($name, $value) 
     {
-        $this->session=  $this->objLogin->getSession();
-        if(empty($this->arrData)) die("No data to insert. Add some data by calling setColumnData function");
-        //fill in the details of the contacts.userId is obtained from loginResult.
-        //$contactData  = array('lastname'=>'Valiant', 'assigned_user_id'=>$userId);
-        //encode the object in JSON format to communicate with the server.
-        $this->setColumnData("assigned_user_id",$this->objLogin->getLoginUserID());
-        $objectJson = json_encode($this->arrData);
-        //name of the module for which the entry has to be created.
-        $moduleName = $this->module;
-
-        //sessionId is obtained from loginResult.
-        $params = array("sessionName"=>$this->session, "operation"=>'create', 
-            "element"=>$objectJson, "elementType"=>$moduleName);
-        $objResponse=auieoCURLGet("{$this->serverURL}/webservice.php", $params);
-
-        //operation was successful get the token from the reponse.
-        if($objResponse->success===false)
-            die('create failed:'.$objResponse->error->errorMsg);
-        $savedObject = $objResponse->result;
-        return $savedObject;
+        if(in_array($name,$this->arrConfig["PUAPI_CHALLENGE_KEY"]))
+        {
+            $this->arrGetData[$name]=$value;
+        }
+        else
+        {
+            die("class variable {$name} not exist");
+        }
+    }
+    public function getChallenge()
+    {
+        $strGetData=false;
+        if(empty($this->arrGetData))
+        {
+            die("No get data set for getting challege. Expected data for operation, username");
+        }
+        foreach($this->arrGetData as $key=>$data)
+        {
+            if($strGetData===false)
+            {
+                $strGetData="{$key}={$data}";
+            }
+            else
+            {
+                $strGetData="{$strGetData}&{$key}={$data}";
+            }
+        }
+        if($strGetData===false) $URL="{$this->serverURL}{$this->arrConfig["PUAPI_CHALLENGE_PAGE"]}";
+        else $URL = "{$this->serverURL}{$this->arrConfig["PUAPI_CHALLENGE_PAGE"]}?{$strGetData}";
+        
+        $this->arrStatus["challenge"]=true;
+        
+        return json_decode(file_get_contents($URL));
+    }
+    public function &getLoginObject()
+    {
+        if(isset($this->arrConfig["PUAPI_CHALLENGE_PAGE"]) && !isset($this->arrStatus["challenge"])) die("Challenge method has to be called before getting login object");
+        $this->objLogin = PUAPILogin::getInstance($this->serverURL);
+        return $this->objLogin;
+    }
+    public function getServerInfo($key)
+    {
+        return $this->objLogin->getResult($key);
     }
 }
 ?>

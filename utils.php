@@ -14,13 +14,14 @@
 *** You should have received a copy of the GNU General Public License
 *** along with PHPUniversalAPI.  If not, see <http://www.gnu.org/licenses/>.*/
 
-function auieoCURLGet($url,$curl_post_data)
+function PUAPIGetCURL($url,$curl_post_data)
 {
     $curl = curl_init($url);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($curl, CURLOPT_POST, true);
     curl_setopt($curl, CURLOPT_POSTFIELDS, $curl_post_data);
-    $json = json_decode(curl_exec($curl));
+    $result=curl_exec($curl);
+    $json = json_decode($result);
     return $json;
 }
 ?>
