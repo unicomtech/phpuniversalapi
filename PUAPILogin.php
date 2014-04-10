@@ -24,7 +24,7 @@ class PUAPILogin
     public function __construct()
     {
         ob_start();
-        include("config.php");
+        include(dirname(__FILE__)."/config.php");
         ob_end_clean();
         $this->arrConfig = get_defined_vars();
     }
