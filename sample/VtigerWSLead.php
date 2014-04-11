@@ -18,7 +18,7 @@ class VtigerWSLead
         $objLogin=$objVtiger->getLoginObject();
         $objLogin->operation="login";
         $objLogin->username="admin";
-        $objLogin->accessKey=md5($objResult->result->token.'gj5ghbyluqauwtza');
+        $objLogin->accessKey=md5($objResult->result->token.'a8POcwcdfybGUX9G');
         $objLoginInfo=$objLogin->login();
         
         $arrField=array();

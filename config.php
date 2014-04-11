@@ -1,5 +1,5 @@
 <?php
-$PUAPI_SERVER_URL="http://www.dnacrm.info/";
+$PUAPI_SERVER_URL="http://127.0.0.1:8080/projects/store/dnacrm/";
 $PUAPI_LOGIN_PAGE="webservice.php";
 $PUAPI_LOGIN_METHOD="post";
 $PUAPI_CHALLENGE_PAGE="webservice.php";
