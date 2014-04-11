@@ -24,7 +24,7 @@ class PUAPILogin
     public function __construct()
     {
         ob_start();
-        include(dirname(__FILE__)."/config.php");
+        include(PUAPI_APP_PATH."config.php");
         ob_end_clean();
         $this->arrConfig = get_defined_vars();
     }
@@ -86,7 +86,8 @@ class PUAPILogin
         {
             $this->serverInfo=PUAPIGetCURL($URL,$this->arrPostData);
         }
-        return $this->serverInfo;
+        if($this->serverInfo->success) return $this->serverInfo;
+        else return false;
     }
     public function getResult($key)
     {

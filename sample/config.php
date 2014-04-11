@@ -6,4 +6,5 @@ $PUAPI_CHALLENGE_PAGE="webservice.php";
 $PUAPI_CHALLENGE_KEY=array("operation","username");
 $PUAPI_LOGIN_POST_KEY=array("operation","username","accessKey");
 $PUAPI_LOGIN_GET_KEY=array();
+$VTIGER_ACCESS_KEY="a8POcwcdfybGUX9G";
 ?>

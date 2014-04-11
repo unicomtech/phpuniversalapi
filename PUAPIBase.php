@@ -31,7 +31,7 @@ class PUAPIBase
     public function __construct()
     {
         ob_start();
-        include(dirname(__FILE__)."/config.php");
+        include(PUAPI_APP_PATH."config.php");
         ob_end_clean();
         $this->arrConfig = get_defined_vars();
         $this->serverURL=$this->arrConfig["PUAPI_SERVER_URL"];
@@ -47,6 +47,13 @@ class PUAPIBase
             die("class variable {$name} not exist");
         }
     }
+    
+    public function getConfigValue($key)
+    {
+        if(isset($this->arrConfig[$key])) return $this->arrConfig[$key];
+        return null;
+    }
+    
     public function getChallenge()
     {
         $strGetData=false;
@@ -68,9 +75,10 @@ class PUAPIBase
         if($strGetData===false) $URL="{$this->serverURL}{$this->arrConfig["PUAPI_CHALLENGE_PAGE"]}";
         else $URL = "{$this->serverURL}{$this->arrConfig["PUAPI_CHALLENGE_PAGE"]}?{$strGetData}";
         
-        $this->arrStatus["challenge"]=true;
-        
-        return json_decode(file_get_contents($URL));
+        $ret = json_decode(file_get_contents($URL));
+        $this->arrStatus["challenge"]=$ret->success;
+        if($ret->success) return $ret;
+        return false;
     }
     public function &getLoginObject()
     {

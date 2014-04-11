@@ -1,0 +1,9 @@
+<?php
+$arrDebug=debug_backtrace();
+$arrPrevFile=array_shift($arrDebug);
+$prevFile=$arrPrevFile["file"];
+$prevDirectory=dirname($arrPrevFile["file"])."/";
+define("PUAPI_APP_PATH",$prevDirectory);
+include_once(dirname(__FILE__)."/PUAPIBase.php");
+include_once(dirname(__FILE__)."/PUAPIAppBase.php");
+?>

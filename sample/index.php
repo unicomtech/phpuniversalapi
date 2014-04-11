@@ -1,6 +1,7 @@
 <?php
 
-include_once(dirname(dirname(__FILE__))."/PUAPIBase.php");
+include_once(dirname(dirname(__FILE__))."/PUAPI.php");
+include_once(dirname(__FILE__)."/VtigerWSProduct.php");
 include_once(dirname(__FILE__)."/VtigerWSLead.php");
 include_once(dirname(__FILE__)."/VtigerWSContact.php");
 
@@ -16,8 +17,8 @@ function on_customer_insert($arrData)
 }
 
 $arrData=array();
-$arrData["lastname"]="lname3";
-$arrData["firstname"]="fname3";
+$arrData["lastname"]="lname12";
+$arrData["firstname"]="fname12";
 $arrData["email"]="email";
 
 on_customer_insert($arrData);
